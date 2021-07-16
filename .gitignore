@@ -2,3 +2,5 @@ db.sqlite3
 .idea/
 myvenv/
 geckodriver.log
+__pycache__
+*.pyc
