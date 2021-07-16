@@ -13,6 +13,12 @@ class DjangoReadyToWorkTestCase(unittest.TestCase):
     # def test_check_browser_title(self):
     #     self.assertEqual(self.browser.title, 'The install worked successfully! Congratulations!')
 
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+
+
     def test_can_start_a_list_and_retrieve_it_later(self):
         self.assertIn('Listy', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -22,19 +28,23 @@ class DjangoReadyToWorkTestCase(unittest.TestCase):
             inputbox.get_attribute('placeholder'),
             'Wpisz rzecz do zrobienia'
         )
-        inputbox.send_keys('Pati')
+        inputbox.send_keys('Kupić pawie pióra')
         inputbox.send_keys(Keys.ENTER)
 
         import time
         time.sleep(6)
 
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
+        self.check_for_row_in_list_table('1: Kupić pawie pióra')
 
-        self.assertTrue(
-            any(row.text == 'Pati' for row in rows),
-            "Nowy element nie znajduje się w tabeli"
-            )
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Użyć pawich piór do zrobienia przynęty')
+        inputbox.send_keys(Keys.ENTER)
+
+        import time
+        time.sleep(6)
+
+        self.check_for_row_in_list_table('1: Kupić pawie pióra')
+        self.check_for_row_in_list_table('2: Użyć pawich piór do zrobienia przynęty')
 
 
     def tearDown(self):
