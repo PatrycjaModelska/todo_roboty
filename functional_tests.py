@@ -22,14 +22,20 @@ class DjangoReadyToWorkTestCase(unittest.TestCase):
             inputbox.get_attribute('placeholder'),
             'Wpisz rzecz do zrobienia'
         )
-        inputbox.send_keys('Kupić pawie pióra')
+        inputbox.send_keys('Pati')
         inputbox.send_keys(Keys.ENTER)
+
+        import time
+        time.sleep(6)
+
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
+
         self.assertTrue(
-            any(row.text == '1: Kupić pawie pióra' for row in rows)
-        )
-        self.fail('Zakończenie testu!')
+            any(row.text == 'Pati' for row in rows),
+            "Nowy element nie znajduje się w tabeli"
+            )
+
 
     def tearDown(self):
         self.browser.quit()
