@@ -1,17 +1,16 @@
-from selenium.webdriver.common.keys import Keys
+from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
-import unittest
 
+class NewVisitorTest(LiveServerTestCase):
 
-class DjangoReadyToWorkTestCase(unittest.TestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
-        self.browser.implicitly_wait(3)
-        self.browser.get('http://127.0.0.1:8000')
 
-    # def test_check_browser_title(self):
-    #     self.assertEqual(self.browser.title, 'The install worked successfully! Congratulations!')
+    def tearDown(self):
+        self.browser.quit()
+
 
     def check_for_row_in_list_table(self, row_text):
         table = self.browser.find_element_by_id('id_list_table')
@@ -20,6 +19,8 @@ class DjangoReadyToWorkTestCase(unittest.TestCase):
 
 
     def test_can_start_a_list_and_retrieve_it_later(self):
+        self.browser.get(self.live_server_url)
+
         self.assertIn('Listy', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Twoja lista rzeczy do zrobienia', header_text)
@@ -46,9 +47,8 @@ class DjangoReadyToWorkTestCase(unittest.TestCase):
         self.check_for_row_in_list_table('1: Kupić pawie pióra')
         self.check_for_row_in_list_table('2: Użyć pawich piór do zrobienia przynęty')
 
+        self.fail('Zakończenie testu!')
 
-    def tearDown(self):
-        self.browser.quit()
 
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+
+
