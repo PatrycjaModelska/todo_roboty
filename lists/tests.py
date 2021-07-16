@@ -33,36 +33,6 @@ class HomePageTest(TestCase):
         # self.assertIn(b'<title>Listy rzeczy do zrobienia</title>', response.content)
         # self.assertTrue(response.content.strip().endswith(b'</html>'))
 
-    def test_home_page_only_saves_items_when_necessary(self):
-        request = HttpRequest()
-        home_page(request)
-        self.assertEqual(Item.objects.count(), 0)
-
-
-    def test_home_page_can_save_a_POST_request(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = 'Nowy element listy'
-        response = home_page(request)
-        self.assertEqual(Item.objects.count(), 1)
-        new_item = Item.objects.first()
-        self.assertEqual(new_item.text, 'Nowy element listy')
-
-        # self.assertIn('Nowy element listy', response.content.decode())
-        # expected_html = render_to_string(
-        #     'home.html',
-        #     {'new_item_text': 'Nowy element listy'}
-        # )
-        # self.assertEqual(remove_csrf_tag(response.content.decode()), expected_html)
-
-    def test_home_page_redirects_after_POST(self):
-         request = HttpRequest()
-         request.method = 'POST'
-         request.POST['item_text'] = 'Nowy element listy'
-         response = home_page(request)
-         self.assertEqual(response.status_code, 302)
-         self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
-
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self):
@@ -93,3 +63,18 @@ class ListViewTest(TestCase):
         response = self.client.get('/lists/the-only-list-in-the-world/')
         self.assertContains(response, 'itemey 1')
         self.assertContains(response, 'itemey 2')
+
+
+class NewListTest(TestCase):
+    def test_saving_a_POST_request(self):
+        self.client.post('/lists/new', data={'item_text': 'Nowy element listy'})
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'Nowy element listy')
+
+    def test_redirects_after_POST(self):
+        response = self.client.post('/lists/new', data={'item_text': 'Nowy element listy'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
+        #alternatywny sposób:
+        # self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
