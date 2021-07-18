@@ -1,0 +1,25 @@
+stages:
+  - build
+  - test
+  - deploy
+
+image: python
+
+before_script:
+  - pip install -r requirements.txt
+
+
+app build:
+  stage: build
+  script:
+    - python manage.py migrate
+    - python manage.py runserver &
+    - sleep 3
+    - curl localhost:8000/ >> output.txt
+    - grep "Wpisz rzecz do zrobienia" output.txt
+
+app test:
+  stage: test
+  script:
+    - python manage.py test functional_tests
+
