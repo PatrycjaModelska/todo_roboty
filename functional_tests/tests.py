@@ -1,13 +1,17 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
+
 
 import os
 
 class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        opts = Options()
+        opts.headless = True
+        self.browser = webdriver.Firefox(options=opts)
         staging_server = os.environ.get('STAGING_SERVER')
         if staging_server:
             self.live_server_url = 'http://' + staging_server
@@ -57,7 +61,9 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.check_for_row_in_list_table('2: Użyć pawich piór do zrobienia przynęty')
 
         self.browser.quit()
-        self.browser = webdriver.Firefox()
+        opts = Options()
+        opts.headless = True
+        self.browser = webdriver.Firefox(options=opts)
         # Franek odwiedza stronę główną.
 
         # Nie znajduje żadnych śladów listy Edyty.
