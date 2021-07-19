@@ -1,29 +1,11 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
+from .base import FunctionalTest
 
-import os
 
-class NewVisitorTest(StaticLiveServerTestCase):
-
-    def setUp(self):
-        opts = Options()
-        opts.headless = True
-        self.browser = webdriver.Firefox(options=opts)
-        staging_server = os.environ.get('STAGING_SERVER')
-        if staging_server:
-            self.live_server_url = 'http://' + staging_server
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows])
-
+class NewVisitorTest(FunctionalTest):
     def test_can_start_a_list_and_retrieve_it_later(self):
         self.browser.get(self.live_server_url)
 
@@ -87,17 +69,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Kupić pawie pióra', page_text)
         self.assertIn('Kupić mleko', page_text)
-
-    def test_layout_and_styling(self):
-        # Edyta przeszła na stronę główną.
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024, 768)
-        # Zauważyła, że pole tekstowe zostało elegancko wyśrodkowane.
-
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)
-        # Edyta utworzyła nową listę i zobaczyła,
-        # że pole tekstowe nadal jest wyśrodkowane.
-        inputbox.send_keys('testing\n')
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=10)
