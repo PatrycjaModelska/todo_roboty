@@ -5,6 +5,7 @@ from selenium.webdriver.firefox.options import Options
 import os
 
 
+
 class FunctionalTest(StaticLiveServerTestCase):
     def setUp(self):
         opts = Options()
