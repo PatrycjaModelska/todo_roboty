@@ -81,6 +81,17 @@ class ListViewTest(TestCase):
             data={'item_text': 'Nowy element dla istniejącej listy'})
         self.assertRedirects(response, '/lists/%d/' % (correct_list.id,))
 
+    def test_validation_errors_end_up_on_lists_page(self):
+        list_ = List.objects.create()
+        response = self.client.post(
+            '/lists/%d/' % (list_.id,),
+            data={'item_text': ''}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'list.html')
+        expected_error = escape("Element nie może być pusty")
+        self.assertContains(response, expected_error)
+
 
 
 class NewListTest(TestCase):
@@ -102,3 +113,13 @@ class NewListTest(TestCase):
         expected_error = "Element nie może być pusty"
         self.assertContains(response, expected_error)
 
+    #test dodany przeze mnie
+    def test_invalid_view_list_items_arent_saved(self):
+        list_ = List.objects.create()
+        self.client.post('/lists/%d/' % (list_.id,), data={'item_text': ''})
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_invalid_list_items_arent_saved(self):
+        self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(List.objects.count(), 0)
+        self.assertEqual(Item.objects.count(), 0)
