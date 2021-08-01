@@ -7,6 +7,7 @@ from django.utils.html import escape
 
 from ..models import List, Item
 from ..views import home_page
+from ..forms import ItemForm
 
 
 def remove_csrf_tag(text):
@@ -15,24 +16,14 @@ def remove_csrf_tag(text):
 
 
 class HomePageTest(TestCase):
-    def test_root_url_resolves_to_home_page_view(self):
-        url = reverse('home')
-        self.assertEqual(resolve(url).func, home_page)
 
-    def test_home_page_returns_correct_html(self):
-        request = HttpRequest()
-        response = home_page(request)
+    def test_home_page_renders_home_template(self):
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
 
-        request = HttpRequest()
-        response = home_page(request)
-        expected_html = render_to_string('home.html')
-        # print(expected_html)
-        # print(remove_csrf_tag(response.content.decode()))
-        self.assertEqual(remove_csrf_tag(response.content.decode()), expected_html)
-
-        # self.assertTrue(response.content.startswith(b'<html>'))
-        # self.assertIn(b'<title>Listy rzeczy do zrobienia</title>', response.content)
-        # self.assertTrue(response.content.strip().endswith(b'</html>'))
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
 
 
 class ListViewTest(TestCase):
