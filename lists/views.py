@@ -13,7 +13,7 @@ def view_list(request, list_id):
     error = None
 
     if request.method == 'POST':
-        item = Item.objects.create(text=request.POST['item_text'], list=list_)
+        item = Item.objects.create(text=request.POST['text'], list=list_)
         try:
             item.full_clean()
             item.save()
@@ -22,16 +22,17 @@ def view_list(request, list_id):
             error = "Element nie może być pusty"
             item.delete()
 
-    return render(request, 'list.html', {'list': list_, 'error': error})
+    return render(request, 'list.html', {'list': list_, 'error': error, 'form': ItemForm()})
 
 
 def new_list(request):
     list_ = List.objects.create()
-    item = Item.objects.create(text=request.POST['item_text'], list=list_)
+    item = Item.objects.create(text=request.POST['text'], list=list_)
     try:
         item.full_clean()
         item.save()
     except ValidationError:
+        error = "Element nie może być pusty"
         list_.delete()
-        return render(request, 'home.html', {'form': ItemForm()})
+        return render(request, 'home.html', {'form': ItemForm(), 'error': error})
     return redirect(list_)

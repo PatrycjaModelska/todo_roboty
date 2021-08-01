@@ -12,7 +12,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertIn('Listy', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('Utwórz nową listę rzeczy do zrobienia', header_text)
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         self.assertEqual(
             inputbox.get_attribute('placeholder'),
             'Wpisz rzecz do zrobienia'
@@ -32,7 +32,7 @@ class NewVisitorTest(FunctionalTest):
 
         self.check_for_row_in_list_table('1: Kupić pawie pióra')
 
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('Użyć pawich piór do zrobienia przynęty')
         inputbox.send_keys(Keys.ENTER)
 
@@ -55,7 +55,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertNotIn('zrobienia przynęty', page_text)
         # Franek tworzy nową listę, wprowadzając nowy element.
         # Jego lista jest mniej interesująca niż Edyty…
-        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox = self.get_item_input_box()
         inputbox.send_keys('Kupić mleko')
         inputbox.send_keys(Keys.ENTER)
         # Franek otrzymuje unikatowy adres URL prowadzący do listy.
