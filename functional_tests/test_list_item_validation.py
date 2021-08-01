@@ -5,11 +5,15 @@ from unittest import skip
 
 
 class ItemValidationTest(FunctionalTest):
+    @skip
     def test_cannot_add_empty_list_items(self):
         # Edyta przeszła na stronę główną i przypadkowo spróbowała utworzyć
         # pusty element na liście. Nacisnęła klawisz Enter w pustym polu tekstowym.
         self.browser.get(self.live_server_url)
-        self.get_item_input_box().send_keys(Keys.ENTER)
+        self.client.post('', data={'text': ''})
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys('')
+        inputbox.send_keys(Keys.ENTER)
 
         # Po odświeżeniu strony głównej zobaczyła komunikat błędu
         # informujący o niemożliwości utworzenia pustego elementu na liście.
