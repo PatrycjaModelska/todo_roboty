@@ -14,7 +14,7 @@ class ItemValidationTest(FunctionalTest):
         # Po odświeżeniu strony głównej zobaczyła komunikat błędu
         # informujący o niemożliwości utworzenia pustego elementu na liście.
         import time
-        time.sleep(2)
+        time.sleep(3)
         error = self.browser.find_element_by_css_selector('.has-error')
         self.assertEqual(error.text, "Element nie może być pusty")
 
@@ -23,14 +23,14 @@ class ItemValidationTest(FunctionalTest):
         inbox.send_keys('Kupić mleko')
         inbox.send_keys(Keys.ENTER)
         import time
-        time.sleep(2)
+        time.sleep(3)
         self.check_for_row_in_list_table('1: Kupić mleko')
 
         # Przekornie po raz drugi spróbowała utworzyć pusty element na liście.
         # Na stronie listy otrzymała ostrzeżenie podobne do wcześniejszego.
         self.browser.find_element_by_id('id_new_item').send_keys(Keys.ENTER)
         import time
-        time.sleep(2)
+        time.sleep(3)
         error = self.browser.find_element_by_css_selector('.has-error')
         self.assertEqual(error.text, "Element nie może być pusty")
 
@@ -38,5 +38,7 @@ class ItemValidationTest(FunctionalTest):
         inbox = self.browser.find_element_by_id('id_new_item')
         inbox.send_keys('Zrobić herbatę')
         inbox.send_keys(Keys.ENTER)
+        import time
+        time.sleep(3)
         self.check_for_row_in_list_table('1: Kupić mleko')
         self.check_for_row_in_list_table('2: Zrobić herbatę')
