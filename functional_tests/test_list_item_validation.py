@@ -1,29 +1,29 @@
 import time
 
+from selenium.common.exceptions import NoSuchElementException
+
 from .base import FunctionalTest
 from selenium.webdriver.common.keys import Keys
-
-from unittest import skip
 
 
 class ItemValidationTest(FunctionalTest):
 
-    @skip
     def test_cannot_add_empty_list_items(self):
         # Edyta przeszła na stronę główną i przypadkowo spróbowała utworzyć
         # pusty element na liście. Nacisnęła klawisz Enter w pustym polu tekstowym.
         self.browser.get(self.live_server_url)
-        self.client.post('', data={'text': ''})
         inputbox = self.get_item_input_box()
         inputbox.send_keys('')
         inputbox.send_keys(Keys.ENTER)
 
-        # Po odświeżeniu strony głównej zobaczyła komunikat błędu
-        # informujący o niemożliwości utworzenia pustego elementu na liście.
+        # Po odświeżeniu strony głównej zobaczyła, że nie utworzył się żaden nowy element
         import time
         time.sleep(3)
-        error = self.browser.find_element_by_css_selector('.has-error')
-        self.assertEqual(error.text, "Element nie może być pusty")
+        table = False
+        try:
+            table = self.browser.find_element_by_id('id_list_table')
+        except NoSuchElementException:
+            self.assertFalse(table)
 
         # Spróbowała ponownie, wpisując dowolny tekst, i wszystko zadziałało.
         inputbox = self.get_item_input_box()
@@ -38,8 +38,10 @@ class ItemValidationTest(FunctionalTest):
         self.get_item_input_box().send_keys(Keys.ENTER)
         import time
         time.sleep(3)
-        error = self.browser.find_element_by_css_selector('.has-error')
-        self.assertEqual(error.text, "Element nie może być pusty")
+
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertNotIn('2: ', [row.text for row in rows])
 
         # Element mogła poprawić, wpisując w nim dowolny tekst.
         inputbox = self.get_item_input_box()
