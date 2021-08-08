@@ -1,3 +1,5 @@
+import time
+
 from .base import FunctionalTest
 from selenium.webdriver.common.keys import Keys
 
@@ -5,6 +7,7 @@ from unittest import skip
 
 
 class ItemValidationTest(FunctionalTest):
+
     @skip
     def test_cannot_add_empty_list_items(self):
         # Edyta przeszła na stronę główną i przypadkowo spróbowała utworzyć
@@ -46,3 +49,21 @@ class ItemValidationTest(FunctionalTest):
         time.sleep(3)
         self.check_for_row_in_list_table('1: Kupić mleko')
         self.check_for_row_in_list_table('2: Zrobić herbatę')
+
+    def test_cannot_add_duplicate_items(self):
+        # Edyta przeszła na stronę główną i zaczęła tworzyć nową listę.
+        self.browser.get(self.live_server_url)
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys('Kupić kalosze')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(2)
+        self.check_for_row_in_list_table('1: Kupić kalosze')
+        # Przypadkowo spróbowała wpisać element, który już znajdował się na liście.
+        inputbox = self.get_item_input_box()
+        inputbox.send_keys('Kupić kalosze')
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(2)
+        # Otrzymała czytelny komunikat błędu.
+        self.check_for_row_in_list_table('1: Kupić kalosze')
+        error = self.browser.find_element_by_css_selector('.has-error')
+        self.assertEqual(error.text, "Podany element już istnieje na liście.")

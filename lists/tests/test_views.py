@@ -16,6 +16,8 @@ def remove_csrf_tag(text):
 
 
 class HomePageTest(TestCase):
+    maxDiff = None
+
 
     def test_home_page_renders_home_template(self):
         response = self.client.get('/')
@@ -25,7 +27,11 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         self.assertIsInstance(response.context['form'], ItemForm)
 
-
+    def test_home_page_returns_correct_html(self):
+        request = HttpRequest()
+        response = home_page(request)
+        expected_html = render_to_string('home.html', {'form': ItemForm()})
+        self.assertMultiLineEqual(remove_csrf_tag(response.content.decode()), expected_html)
 
 
 class ListViewTest(TestCase):
@@ -92,6 +98,12 @@ class ListViewTest(TestCase):
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_LIST_ERROR))
 
+    def test_displays_item_form(self):
+        list_ = List.objects.create()
+        response = self.client.get('/lists/%d/' % (list_.id,))
+        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertContains(response, 'name="text"')
+
 
 class NewListTest(TestCase):
     def test_saving_a_POST_request(self):
@@ -129,9 +141,4 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
-    def test_displays_item_form(self):
-        list_ = List.objects.create()
-        response = self.client.get('/lists/%d/' % (list_.id,))
-        self.assertIsInstance(response.context['form'], ItemForm)
-        self.assertContains(response, 'name="text"')
 
